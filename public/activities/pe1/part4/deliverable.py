@@ -9,7 +9,23 @@ def read_pgm(filename):
             1st element is a list of PGM header values as strings
             2nd element is a list of pixel intensities as strings
     '''
-    pass
+    headerlist = list()
+    pixelintensity = list()
+    try:
+        fobj = open(filename,'r+')
+        fobj.seek(0,0)
+        for line in range(0,4):
+            linebuf = fobj.readline()
+            headerlist.append(linebuf.rstrip('\n'))
+        #whereami = fobj.tell()
+        #print("My current position is {}\n".format(whereami))
+        #assert(fobj.tell() == 16)
+        for line in fobj.readlines():
+            pixelintensity.append(line.rstrip('\n'))
+    except OSError as e:
+        print(e)
+    print(headerlist,"\n",pixelintensity)
+    return (headerlist,pixelintensity)
 
 def write_pgm(filename,content):
     '''Writes a PGM file
@@ -21,7 +37,22 @@ def write_pgm(filename,content):
     Returns:
         None
     '''
-    pass
+    try:
+        fobj = open(filename,'w')
+        headers = content[0]
+        intensities = content[1]
+        fobj.seek(0,0)
+        writeme = list()
+        for line in headers:
+            writeme.append(line)
+        for line in intensities:
+            writeme.append(line)
+        for line in writeme:
+            fobj.write("{}\n".format(line))
+    except OSError as e:
+        print(e)
+    finally:
+        fobj.close()
 
 def invert(content):
     '''Modifies the pixel intensities of the given content to be inverted
@@ -32,7 +63,16 @@ def invert(content):
     Returns:
         None
     '''
-    pass
+    contlist = list(content)
+    header = contlist[0]
+    intensities = contlist[1]
+    newintensities = list()
+    print("Invert this: {}\n".format(intensities))
+    for intensity in intensities:
+        newintensities.append(str(255-int(intensity)))
+    contlist[1] = newintensities
+    content = tuple(contlist)
+    print("Inverted as: {}\n".format(content))
 
 if __name__ == '__main__':
     pass

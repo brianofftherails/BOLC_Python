@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# This is the solution provided by instructor
 
 def read_pgm(filename):
     with open(filename,'r') as fp:

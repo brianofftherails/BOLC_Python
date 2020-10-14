@@ -54,6 +54,10 @@ def write_pgm(filename,content):
     finally:
         fobj.close()
 
+def invert_helper(input_string):
+    return str(255-int(input_string))
+
+
 def invert(content):
     '''Modifies the pixel intensities of the given content to be inverted
     Args:
@@ -63,16 +67,7 @@ def invert(content):
     Returns:
         None
     '''
-    contlist = list(content)
-    header = contlist[0]
-    intensities = contlist[1]
-    newintensities = list()
-    print("Invert this: {}\n".format(intensities))
-    for intensity in intensities:
-        newintensities.append(str(255-int(intensity)))
-    contlist[1] = newintensities
-    content = tuple(contlist)
-    print("Inverted as: {}\n".format(content))
+    content = (content[0],list(map(invert_helper,content[1])))
 
 if __name__ == '__main__':
     pass

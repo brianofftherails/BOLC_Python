@@ -20,7 +20,8 @@ def invert_helper(input_string):
 
 # This probably won't work with check.py's unittest, but it is a correct solution
 def invert(content):
-    content = (content[0],list(map(invert_helper,content[1])))
+    #content = (content[0],list(map(invert_helper,content[1])))
+    content[1][:] = map(invert_helper,content[1])
     
     
 if __name__ == '__main__':

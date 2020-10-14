@@ -1,0 +1,168 @@
+heat_template_version: 2016-10-14
+
+description: Python Programming Heat Template Version 0000
+
+parameters:
+
+  last_name:
+    type: string
+    label: Last Name
+    description: Last Name
+    default:
+    constraints:
+      - length: { min: 1, max: 20 }
+        description: Last name must be no longer than 20 characters
+      - allowed_pattern: "[a-zA-Z]*"
+        description: Last name may only contain letters
+
+  password:
+    type: string
+    label: Password
+    description: set root/admin password for instances
+    hidden: true
+    default: password
+    constraints:
+      - length: { min: 8, max: 20 }
+        description: Password must be between 8 and 20 characters
+      - allowed_pattern: "[a-zA-Z0-9]*"
+        description: Password may not contain special characters   
+  
+resources: 
+
+  external_router:
+    type: OS::Neutron::Router
+    properties:
+      name: external_router
+      external_gateway_info: { network: public }
+    
+  network0: 
+    type: OS::Neutron::Net
+    properties: 
+      admin_state_up: true
+      name: net0
+      shared: false
+
+  subnetwork0: 
+    type: OS::Neutron::Subnet
+    properties: 
+      allocation_pools:
+        - start: 10.0.0.5
+          end: 10.0.0.250
+      cidr: 10.0.0.0/24 
+      dns_nameservers:
+        - 10.50.255.254     
+      enable_dhcp: true
+      gateway_ip: 10.0.0.254
+      name: subnet0
+      ip_version: 4
+      network_id: { get_resource: network0 }     
+ 
+  external_router_int0:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: external_router }
+      subnet_id: { get_resource: subnetwork0 }
+
+  secgroup_0:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: Enable RDP and ICMP
+      name: RDP/ICMP Enable
+      rules: [{"port_range_max":3389,"port_range_min":3389,"protocol":TCP},{"protocol":ICMP}]
+      
+  float_ip:
+    type: OS::Neutron::FloatingIP
+    depends_on: external_router
+    properties:
+      floating_network: public
+
+  float_port:
+    type: OS::Neutron::Port
+    depends_on: secgroup_0
+    properties:
+      network_id: { get_resource: network0 }
+      fixed_ips:
+      - subnet_id: { get_resource: subnetwork0 }
+        ip_address: 10.0.0.1
+      security_groups:
+      - { get_resource: secgroup_0 }
+  
+  float_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: float_ip }
+      port_id: { get_resource: float_port }
+     
+  port_2: 
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_resource: network0 }
+      fixed_ips:
+        - subnet_id: { get_resource: subnetwork0 }
+          ip_address: 10.0.0.2
+      port_security_enabled: false
+ 
+  server1:
+    type: OS::Nova::Server
+    properties:
+      name:
+        str_replace: 
+          template: lastname-win10
+          params:
+            lastname: { get_param: last_name }
+      image: Windows 10
+      flavor: cy.large
+      networks:
+        - port: { get_resource: float_port }
+      user_data:
+        str_replace:
+          template: | 
+            #ps1_sysnative
+            $ErrorActionPreference = 'SilentlyContinue'
+            netsh advfirewall set allprofiles state off
+            set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -Value 0
+            (new-object System.Net.WebClient).DownloadFile('https://download.mozilla.org/?product=firefox-52.0.2-SSL&os=win64&lang=en-US','C:\firefox.exe')
+            & c:\firefox.exe -ms
+            (new-object System.Net.WebClient).DownloadFile('https://notepad-plus-plus.org/repository/6.x/6.9.2/npp.6.9.2.Installer.exe','C:\npp.exe')
+            & c:\npp.exe /S
+            (new-object System.Net.WebClient).DownloadFile('https://the.earth.li/~sgtatham/putty/latest/w64/putty-64bit-0.68-installer.msi','C:\putty.msi')
+            & msiexec /i c:\putty.msi /quiet /passive
+            net user /add $user $password /y
+            net localgroup administrators /add $user
+            exit 1001
+          params:
+            $password: { get_param: password }
+            $user: { get_param: last_name }
+      user_data_format: RAW      
+            
+  server2:
+    type: OS::Nova::Server
+    properties:
+      name:
+        str_replace: 
+          template: lastname-debian 
+          params:
+            lastname: { get_param: last_name }
+      image: Debian LXDE
+      flavor: cy.medium
+      networks:
+        - port: { get_resource: port_2 }
+      user_data:
+        str_replace:
+          template: | 
+            #!/bin/bash
+            useradd $user -m -U -s /bin/bash
+            usermod -aG sudo $user
+            echo "$user:$password" | chpasswd
+            apt-get update -y
+            apt-get install git -y
+            reboot
+          params:
+            $password: { get_param: password }
+            $user: { get_param: last_name }
+      user_data_format: RAW      
+      
+outputs:
+  floating_ip:
+    description: Windows 10 Jump Box floating IP for RDP Access
+    value: { get_attr: [float_ip, floating_ip_address] }

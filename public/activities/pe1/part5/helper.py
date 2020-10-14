@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Utilities file to be included by deliverable.py
 
 def steg_encode_char(char, cover):
     # ENCODES SINGLE CHARACTER
@@ -30,7 +29,6 @@ def steg_encode(msg, cover):
             coverbinl[-1] = charbin[index]
             cover[coverindex] = str(int("".join(coverbinl), 2))
             coverindex += 1
-    #return print(cover)
 
 def steg_decode(stego):
     #DECODES WORD
@@ -113,3 +111,4 @@ def invert(content):
         None
     '''
     content = (content[0],list(map(invert_helper,content[1])))
+    

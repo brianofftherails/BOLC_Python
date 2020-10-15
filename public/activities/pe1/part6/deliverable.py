@@ -1,5 +1,23 @@
 #!/usr/bin/env python3
 
+from itertools import repeat
+
+def char_rshift(char, int_shift):
+    assert ord(char) in range(32,127)
+    #only tests for chars that will break the program
+    if char == " ":
+        return " "
+    else:
+        return chr(97+(ord(char)+int_shift-97)%26)
+
+def char_lshift(char,int_shift):
+    assert ord(char) in range(32,127)
+    #only tests for chars that will break the program
+    if char == ' ':
+        return ' '
+    else:
+        return chr(97 + (ord(char) - int_shift - 97) % 26)
+
 def caesar_encrypt(plaintext,key):
     '''Encrypts plaintext using the Caesar Cipher
     Args:
@@ -8,7 +26,8 @@ def caesar_encrypt(plaintext,key):
     Returns:
         str: the encrypted ciphertext
     '''
-    pass
+    return ''.join(list(map(char_rshift,list(plaintext),repeat(key))))
+
 
 def caesar_decrypt(ciphertext,key):
     '''Decrypts ciphertext using the Caesar Cipher
@@ -18,7 +37,7 @@ def caesar_decrypt(ciphertext,key):
     Returns:
         str: the decrypted plaintext
     '''
-    pass
+    return ''.join(list(map(char_lshift, list(ciphertext),repeat(key))))
 
 
 if __name__ == '__main__':

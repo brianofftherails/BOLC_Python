@@ -2,10 +2,12 @@
 
 import helper as utils
 
+
 def sentinel():
     return chr(128)
 
-def encode_pgm(msg,coverfilename,outputfilename):
+
+def encode_pgm(msg, coverfilename, outputfilename):
     '''Encodes a message in a PGM file
     Args:
         msg (str): the message to encode
@@ -14,26 +16,14 @@ def encode_pgm(msg,coverfilename,outputfilename):
     Returns:
         None
     '''
-    try:
-        fobj = open(coverfilename,'r')
-        #fobj.seek(2,0)
-        #file_length = fobj.tell()
-        #msglist = list(msg)
-        #assert (file_length+1) >= (len(msglist)*4)
-        #fobj.seek(0,11) #seek to after header
-        fobj.seek(0,0)
-        cover = fobj.readlines()
-        header = cover[0:4]
-        del cover[0:4]
-        utils.steg_encode(msg,cover)
-        fobj.close()
-    except OSError as e:
-        print(e)
+    input_tuple = utils.read_pgm(coverfilename)
+    header = input_tuple[0]
+    cover = input_tuple[1]
+    utils.steg_encode(msg,cover) #modifies cover argument
     try:
         fobj = open(outputfilename,'w')
-        for line in header:
-            fobj.write("{}\n".format(line))
-        for line in cover:
+        assert not fobj.tell()
+        for line in header+cover:
             fobj.write("{}\n".format(line))
         fobj.close()
     except OSError as e:
@@ -47,15 +37,17 @@ def decode_pgm(filename):
         str: the message that was encoded in the PGM file
     '''
     try:
-        fobj = open(filename,'r')
-        decodeme = list()
-        fobj.seek(0,11)
-        for line in fobj.readlines():
-            decodeme.append(line)
-        decoded_list = utils.steg_decode(decodeme)
-        
+        fileconts = utils.read_pgm(filename)
     except OSError as e:
         print(e)
+    decoded_message = utils.steg_decode(fileconts[1])
+    found_eom = list()
+    for char in list(decoded_message):
+        if char == sentinel():
+            break
+        else:
+            found_eom.append(char)
+    return ''.join(found_eom)
 
 if __name__ == '__main__':
     pass

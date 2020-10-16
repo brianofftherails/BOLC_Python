@@ -1,0 +1,92 @@
+EXAM TOPICS INFORMATION
+--- notes on it --- 
+--- question with no arguments: prompt the user for input 
+------ use input function
+---gimme question:
+    - just do exactly what it says, probably just as easy as it sounds
+    
+    
+perform a calculation given one or more arguments and a formula 
+- formula will be given
+- remember the formula for taking an average 
+determine properties of an IPv4 address
+- going to be given an address and asked to determine something about it
+- first thing to do with address
+    - address given to you in the form of a string 
+    - likely going to split the string on the periods in the ipv4 address
+        - .split(.)
+    - going to have to convert the octets into integers
+    - use a for loop to convert them all into integers
+    - then if its asking for which octet is higher or lower
+    - split - into list of strings - then items into ints - then you have list of ints
+    
+correlate information i.e map
+- demonstrate ability to if/else statements
+- maybe a function that recieves a number as an int and returns that number as a string 
+- take in "1" and returns "one" 
+- if/elif/else
+filter and convert data
+- prompt user for input
+- question will ask you to filter in the garbage in a certainway
+--- disregard all puncuation and numbers and only look at characters 
+and then join them together into a word and return that word
+- function takes garbage and gets rid of anything that isn't ascii and return that string of character/words 
+- filter/convert: you have all the characters, question may ask you to return a list of the ordinal number for each character/words
+        - ord(a) 
+        - do that to all the characters and add them to a list then return that list 
+- may ask you to get rid of all the numbers, or letters or something like that
+    - functions
+        - .isnumeric (on a string)
+            - returns a boolean value, if the string is entirely numbers then it will return true (using in an IF statement) 
+        - go through the string and call .isnumeric on each character, if its what you want, put it in the new list if not get rid of it
+- practice where you keep the numbers and then again just keeping the letters 
+construct a complicated string from component parts. str.format, for mat()
+- a lot of people just concatenate with '+' in between strings 
+- they would prefer us to use .format()
+- will likely have three arguments and return someones first middle and last name
+    - use {} {} {}.format()
+    
+    
+file IO
+- DONT 
+    - the argument names will likely be 'filename'. thats just the argument name. 
+    - don't wrap filename in quotes when using the open call because it looks for that exact file name, just call the argument 
+    - readlines / readline 
+    - if you start reading and then stop its going to start where it left off, so may have to start over at the top
+    
+    
+deconstruct a string into parts using .split() .join() or slicing
+- slicing a the middle initial of a name 
+construct a dictionary
+- give us some input arguments that we will use to construct a dictionary
+- use accumulation pattern of starting with an empty dictionary and add to it as appropriate until complete
+    - so make an empty dictionary and then add to it
+- then return the dictionary 
+construct a tuple
+- dont start with making an empty tuple (they're immutable, can't add to it)
+- create an empty list and add to the list the convert it to a tuple
+try an operation and if it fails do something else 
+- try except
+Perform an operation on variable length arguments
+- *args (tuple) or **qwargs (dictionary)
+    - * and ** are only in the function signature where the arguments are passed in 
+    - they will provided for you 
+    - since its already typed for you, you never in the body of the function will type '*' or '**' next to args or qwargs
+    - probably will want the values of the items in the dictionary so youll need to ask for d.values()
+    
+    
+Socket IO
+- connect with an IP address on this port and receive this message 
+- non brittle method into your notes
+- .connect((address))  (don't forget the double parentheses) 
+    - the address will have an IP and a port which is why you'll need both
+    
+    
+Define class according to a specification OOP
+- will get an example
+- create a class (baloon example)
+    - altitude: rise, fall, land 
+    - call instance of a baloon and manipulate it to do things 
+    
+    
+Bitwise operators
